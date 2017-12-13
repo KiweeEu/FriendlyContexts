@@ -36,17 +36,15 @@ class AliceContext extends Context
     {
         $persistable = $this->getPersistableClasses();
 
-        foreach ($fixtures as $id => $fixture) {
-            if (in_array($id, $files)) {
-                foreach ($loader->loadFile($fixture)->getObjects() as $object) {
-                    if (in_array(get_class($object), $persistable)) {
-                        $this->getEntityManager()->persist($object);
-                    }
-                }
+        $fs = array_values(array_intersect_key($fixtures, array_flip($files)));
 
-                $this->getEntityManager()->flush();
+        foreach ($loader->loadFiles($fs)->getObjects() as $object) {
+            if (in_array(get_class($object), $persistable)) {
+                $this->getEntityManager()->persist($object);
             }
         }
+
+        $this->getEntityManager()->flush();
     }
 
     private function getPersistableClasses()

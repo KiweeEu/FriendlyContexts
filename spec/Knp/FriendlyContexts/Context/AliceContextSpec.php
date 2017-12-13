@@ -31,9 +31,9 @@ class AliceContextSpec extends ObjectBehavior
         $event->getFeature()->willReturn($feature);
         $event->getScenario()->willReturn($scenario);
         $objectSet = new ObjectSet(new ParameterBag(), new ObjectBag());
-        $loader->loadFile('user.yml')->willReturn($objectSet);
-        $loader->loadFile('product.yml')->willReturn($objectSet);
-        $loader->loadFile('place.yml')->willReturn($objectSet);
+        $loader->loadFiles(['user.yml', 'place.yml'])->willReturn($objectSet);
+        $loader->loadFiles(['product.yml'])->willReturn($objectSet);
+        $loader->loadFiles(['user.yml', 'product.yml', 'place.yml'])->willReturn($objectSet);
         $loader->getCache()->willReturn([]);
         $loader->clearCache()->willReturn(null);
         $fixtures = [ 'User' => 'user.yml', 'Product' => 'product.yml', 'Place' => 'place.yml' ];
@@ -62,9 +62,10 @@ class AliceContextSpec extends ObjectBehavior
     {
         $manager->flush()->shouldBeCalled();
 
-        $loader->loadFile('user.yml')->shouldBeCalled();
-        $loader->loadFile('place.yml')->shouldBeCalled();
-        $loader->loadFile('product.yml')->shouldNotBeCalled();
+        $loader->loadFiles(['user.yml', 'place.yml'])->shouldBeCalled();
+        $loader->loadFiles(['user.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['product.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['place.yml'])->shouldNotBeCalled();
 
         $this->loadAlice($event);
     }
@@ -74,9 +75,10 @@ class AliceContextSpec extends ObjectBehavior
         $scenario->getTags()->willReturn([ 'alice(*)' ]);
         $manager->flush()->shouldBeCalled();
 
-        $loader->loadFile('user.yml')->shouldBeCalled();
-        $loader->loadFile('place.yml')->shouldBeCalled();
-        $loader->loadFile('product.yml')->shouldBeCalled();
+        $loader->loadFiles(['user.yml', 'product.yml', 'place.yml'])->shouldBeCalled();
+        $loader->loadFiles(['user.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['product.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['place.yml'])->shouldNotBeCalled();
 
         $this->loadAlice($event);
     }
@@ -86,9 +88,10 @@ class AliceContextSpec extends ObjectBehavior
         $scenario->getTags()->willReturn([]);
         $manager->flush()->shouldBeCalled();
 
-        $loader->loadFile('user.yml')->shouldBeCalled();
-        $loader->loadFile('place.yml')->shouldBeCalled();
-        $loader->loadFile('product.yml')->shouldNotBeCalled();
+        $loader->loadFiles(['user.yml', 'place.yml'])->shouldBeCalled();
+        $loader->loadFiles(['user.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['product.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['place.yml'])->shouldNotBeCalled();
 
         $deps = [ 'Place' => [ 'User' ] ];
         $container->getParameter('friendly.alice.dependencies')->willReturn($deps);
@@ -98,13 +101,13 @@ class AliceContextSpec extends ObjectBehavior
 
     function it_should_not_loop_infinitly($container, $loader, $event, $scenario, $manager)
     {
-
         $scenario->getTags()->willReturn([]);
         $manager->flush()->shouldBeCalled();
 
-        $loader->loadFile('user.yml')->shouldBeCalled();
-        $loader->loadFile('place.yml')->shouldBeCalled();
-        $loader->loadFile('product.yml')->shouldNotBeCalled();
+        $loader->loadFiles(['user.yml', 'place.yml'])->shouldBeCalled();
+        $loader->loadFiles(['user.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['product.yml'])->shouldNotBeCalled();
+        $loader->loadFiles(['place.yml'])->shouldNotBeCalled();
 
         $deps = [ 'Place' => [ 'User' ], 'User' => [ 'Place' ] ];
         $container->getParameter('friendly.alice.dependencies')->willReturn($deps);
