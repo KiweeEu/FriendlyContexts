@@ -3,15 +3,15 @@
 namespace Knp\FriendlyContexts\Alice\Fixtures;
 
 use Knp\FriendlyContexts\Alice\ProviderResolver;
-use Nelmio\Alice\Fixtures\Loader as BaseLoader;
+use Nelmio\Alice\Loader\NativeLoader;
 
-class Loader extends BaseLoader
+class Loader extends NativeLoader
 {
     private $cache = [];
 
     public function __construct($locale, ProviderResolver $providers)
     {
-        parent::__construct($locale, $providers->all());
+        parent::__construct(null);
     }
 
     public function getCache()
